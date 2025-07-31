@@ -50,7 +50,7 @@
             </div>
             @endif
 
-            @foreach($membersBankDetails as $bankDetails)
+            {{-- @foreach($membersBankDetails as $bankDetails)
 
             <div>
                 <strong>Bank Name : {{ $bankDetails->BankName }} </strong><br>
@@ -63,7 +63,39 @@
             <center class="mb-1">
                 <img src="{{ url(asset($bankDetails->qrCodeUpload	))}}" class="imaged w200">
             </center>
-            @endforeach
+            @endforeach --}}
+
+            @foreach($membersBankDetails as $bankDetails)
+    <div>
+        @if(!empty($bankDetails->BankName))
+            <strong>Bank Name : {{ $bankDetails->BankName }}</strong><br>
+        @endif
+
+        @if(!empty($bankDetails->BankIFSC))
+            <strong>Bank IFSC Code: {{ $bankDetails->BankIFSC }}</strong><br>
+        @endif
+
+        @if(!empty($bankDetails->name))
+            <strong>AC Holder Name : {{ $bankDetails->name }}</strong><br>
+        @endif
+
+        @if(!empty($bankDetails->BankACNo))
+            <strong>Bank AC. No : {{ $bankDetails->BankACNo }}</strong><br>
+        @endif
+
+        @if(!empty($bankDetails->upiId))
+            <strong>UPI Id : {{ $bankDetails->upiId }}</strong><br>
+        @endif
+
+        @if(!empty($bankDetails->qrCodeUpload))
+            <strong>UPI QR Code 👇</strong><br><br>
+            <center class="mb-1">
+                <img src="{{ url(asset($bankDetails->qrCodeUpload)) }}" class="imaged w200">
+            </center>
+        @endif
+    </div>
+@endforeach
+
 
         </div>
     </div>

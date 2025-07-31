@@ -198,7 +198,7 @@
 
 
                      <div class="custom-file-upload" id="fileUpload2">
-                        <input  type="file" id="upi_qr_code" accept=".png, .jpg, .jpeg" name="upi_qr_code">
+                        <input  type="file" id="upi_qr_code" accept=".png, .jpg, .jpeg" name="upi_qr_code" required>
                         <label for="upi_qr_code">
                             <span>
                                 <strong>

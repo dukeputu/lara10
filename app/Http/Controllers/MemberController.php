@@ -382,7 +382,7 @@ public function registerUserApp(Request $request)
         // 'password'         => 'required|string|max:255',
         'address'          => 'nullable|string',
         'profile_picture'      => 'nullable|file|mimes:jpeg,png,jpg,|max:20048',
-        'upi_qr_code'      => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
+        'upi_qr_code'      => 'required|nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
     ]);
 
     

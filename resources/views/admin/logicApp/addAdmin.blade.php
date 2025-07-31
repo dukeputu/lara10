@@ -113,25 +113,25 @@
                             <div class="form-group col-md-4">
                                 <label>Bank Name<sup>*</sup></label>
                                 <input type="text" name="BankName" class="form-control"
-                                    value="{{ old('BankName', $company->BankName ?? '') }}" required>
+                                    value="{{ old('BankName', $company->BankName ?? '') }}" >
                             </div>
 
                             <div class="form-group col-md-4">
                                 <label>Bank AC No.<sup>*</sup></label>
                                 <input type="text" name="BankACNo" class="form-control"
-                                    value="{{ old('BankACNo', $company->BankACNo ?? '') }}" required>
+                                    value="{{ old('BankACNo', $company->BankACNo ?? '') }}" >
                             </div>
 
                             <div class="form-group col-md-4">
                                 <label>Bank IFSC<sup>*</sup></label>
                                 <input type="text" name="BankIFSC" class="form-control"
-                                    value="{{ old('BankIFSC', $company->BankIFSC ?? '') }}" required>
+                                    value="{{ old('BankIFSC', $company->BankIFSC ?? '') }}" >
                             </div>
 
                             <div class="form-group col-md-4">
                                 <label>UPI ID<sup>*</sup></label>
                                 <input type="text" name="upiId" class="form-control"
-                                    value="{{ old('upiId', $company->upiId ?? '') }}" required>
+                                    value="{{ old('upiId', $company->upiId ?? '') }}" >
                             </div>
 
                             <div class="form-group col-md-4">
@@ -139,7 +139,7 @@
                                 @if($isEdit && !empty($company->qrCodeUpload))
                                 <div>
                                     <a target="_blank" href="{{ url($company->qrCodeUpload) }}">
-                                         <img src="{{ asset($company->qrCodeUpload) }}" alt="" width="100">
+                                         <img src="{{ asset($company->qrCodeUpload) }}" alt="" width="100" required>
                                         </a>
                                    <span> <small> 👈 Click to Big View </small></span>
                                 </div>
