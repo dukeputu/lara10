@@ -35,7 +35,10 @@
             </a>
         </div>
         <div class="pageTitle">
-            <img src="{{ url('userApp/assets/img/logo.png') }}" alt="logo" class="logo">
+            {{-- <img src="{{ url('userApp/assets/img/logo.png') }}" alt="logo" class="logo"> --}}
+
+            
+             <img  style="border-radius: 10px;margin: 8px 0 0 15px;" width="60" src="{{ url('userApp/assets/goldoffLogo.webp')}}" alt="">
         </div>
         <div class="right">
 
