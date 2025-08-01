@@ -37,8 +37,9 @@
         <div class="pageTitle">
             {{-- <img src="{{ url('userApp/assets/img/logo.png') }}" alt="logo" class="logo"> --}}
 
-            
-             <img  style="border-radius: 10px;margin: 8px 0 0 15px;" width="60" src="{{ url('userApp/assets/goldoffLogo.webp')}}" alt="">
+
+            <img style="border-radius: 10px;margin: 8px 0 0 15px;" width="60"
+                src="{{ url('userApp/assets/goldoffLogo.webp') }}" alt="">
         </div>
         <div class="right">
 
@@ -472,12 +473,12 @@
 
             /* Text glow inside the card */
             /* .card-bg-golden h1,
-    .card-bg-golden .title,
-    .card-bg-golden .label,
-    .card-bg-golden span,
-    .card-bg-golden p {
-        text-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
-    } */
+        .card-bg-golden .title,
+        .card-bg-golden .label,
+        .card-bg-golden span,
+        .card-bg-golden p {
+            text-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
+        } */
 
             /* Shimmer animation for background */
             @keyframes shimmerGold {
@@ -531,19 +532,17 @@
                                         Gold Buy
                                     </button>
                                 </form> --}}
-                                <form
-                                        action="{{ route('package.buy') }}"
-                                        method="POST"
-                                        onsubmit="return validatePackagePurchase(
+                                <form action="{{ route('package.buy') }}" method="POST"
+                                    onsubmit="return validatePackagePurchase(
                                             {{ $appPackage->id }},
                                             {{ $hasBoughtPackage1 ? 'true' : 'false' }},
                                             '{{ addslashes($appPackage->package_name) }}',
                                             {{ $appPackage->package_amount }}
                                         );">
-                                        @csrf
-                                        <input type="hidden" name="package_id" value="{{ $appPackage->id }}">
-                                        <button type="submit" class="btn btn-lg btn-gold-animated">Gold Buy</button>
-                                    </form>
+                                    @csrf
+                                    <input type="hidden" name="package_id" value="{{ $appPackage->id }}">
+                                    <button type="submit" class="btn btn-lg btn-gold-animated">Gold Buy</button>
+                                </form>
 
 
                             </div>
@@ -581,26 +580,26 @@
 
             </div>
 
-<script>
-function validatePackagePurchase(packageId, hasBoughtPackage1, packageName, packageAmount) {
+            <script>
+                function validatePackagePurchase(packageId, hasBoughtPackage1, packageName, packageAmount) {
 
-    if (packageId == 1 && hasBoughtPackage1) {
-        alert("❌ You have already bought " + packageName + ". It can only be purchased once.");
-        return false;
-    }
+                    if (packageId == 1 && hasBoughtPackage1) {
+                        alert("❌ You have already bought " + packageName + ". It can only be purchased once.");
+                        return false;
+                    }
 
-    if (packageId != 1 && !hasBoughtPackage1) {
-        alert("⚠️ Please buy Package 1 first before purchasing " + packageName + ".");
-        return false;
-    }
+                    if (packageId != 1 && !hasBoughtPackage1) {
+                        alert("⚠️ Please buy Package 1 first before purchasing " + packageName + ".");
+                        return false;
+                    }
 
-    return confirm(
-        "Are you sure you want to buy " +
-        packageName +
-        " for ₹" + packageAmount.toFixed(2) + "?"
-    );
-}
-</script>
+                    return confirm(
+                        "Are you sure you want to buy " +
+                        packageName +
+                        " for ₹" + packageAmount.toFixed(2) + "?"
+                    );
+                }
+            </script>
 
 
 
@@ -749,13 +748,14 @@ function validatePackagePurchase(packageId, hasBoughtPackage1, packageName, pack
                         </li> --}}
 
                         <li>
-    <a href="#" class="item" data-bs-toggle="modal" data-bs-target="#updatePasswordModal">
-        <div class="icon-box bg-primary">
-            <ion-icon name="finger-print-outline"></ion-icon>
-        </div>
-        <div class="in">Update Password</div>
-    </a>
-</li>
+                            <a href="#" class="item" data-bs-toggle="modal"
+                                data-bs-target="#updatePasswordModal">
+                                <div class="icon-box bg-primary">
+                                    <ion-icon name="finger-print-outline"></ion-icon>
+                                </div>
+                                <div class="in">Update Details</div>
+                            </a>
+                        </li>
 
 
                         <li>
@@ -786,113 +786,117 @@ function validatePackagePurchase(packageId, hasBoughtPackage1, packageName, pack
 
 
 
-<!-- Update Password Modal -->
-<div class="modal fade" id="updatePasswordModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
 
-            <div class="modal-header">
-                <h5 class="modal-title">Update Password</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+
+    <!-- Update Password and Bank Details Modal -->
+    <div class="modal fade" id="updatePasswordModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Password & Bank Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <form id="updatePasswordForm" enctype="multipart/form-data">
+                        @csrf
+
+                        <!-- Password Fields -->
+                        <div class="form-group mb-2">
+                            <label for="new_password">New Password</label>
+                            <input type="text" class="form-control" id="new_password" name="new_password">
+                        </div>
+
+                        <div class="form-group mb-2">
+                            <label for="confirm_password">Confirm New Password</label>
+                            <input type="text" class="form-control" id="confirm_password" name="confirm_password">
+                        </div>
+
+                        <!-- Bank Details -->
+                        <div class="form-group mb-2">
+                            <label>Bank Name</label>
+                            <input type="text" class="form-control" name="bank_name">
+                        </div>
+
+                        <div class="form-group mb-2">
+                            <label>IFSC Code</label>
+                            <input type="text" class="form-control" name="ifsc_code">
+                        </div>
+
+                        <div class="form-group mb-2">
+                            <label>Bank Account Number</label>
+                            <input type="text" class="form-control" name="bank_account_no">
+                        </div>
+
+                        <div class="form-group mb-2">
+                            <label>UPI ID</label>
+                            <input type="text" class="form-control" name="upi_id">
+                        </div>
+
+                        <div class="form-group mb-2">
+                            <label>UPI QR Code (Image)</label>
+                            <input type="file" class="form-control" name="upi_qr_code" accept="image/*">
+                        </div>
+
+                        <div class="form-group mb-2">
+                            <label>User Profile Pic (Optional)</label>
+                            <input type="file" class="form-control" name="user_pic_img" accept="image/*">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Update</button>
+                    </form>
+
+                    <div id="passwordUpdateMsg" class="mt-3 text-center"></div>
+                </div>
+
             </div>
-
-            <div class="modal-body">
-                <form id="updatePasswordForm">
-                    @csrf
-
-                    <div class="form-group mb-2">
-                        <label for="new_password">New Password</label>
-                        <input type="password" class="form-control" id="new_password" required>
-                    </div>
-
-                    <div class="form-group mb-2">
-                        <label for="confirm_password">Confirm New Password</label>
-                        <input type="password" class="form-control" id="confirm_password" required>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100">Update</button>
-                </form>
-
-                <div id="passwordUpdateMsg" class="mt-3 text-center"></div>
-            </div>
-
         </div>
     </div>
-</div>
 
 
-{{-- <script>
-document.getElementById('updatePasswordForm').addEventListener('submit', function (e) {
-    e.preventDefault();
 
-    const new_password = document.getElementById('new_password').value;
-    const confirm_password = document.getElementById('confirm_password').value;
-    const messageBox = document.getElementById('passwordUpdateMsg');
 
-    messageBox.innerHTML = '⏳ Updating...';
 
-    fetch('{{ route("user.password.update") }}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify({ new_password, confirm_password })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            messageBox.innerHTML = `<span class="text-success">✅ ${data.message}</span>`;
-            document.getElementById('updatePasswordForm').reset();
-        } else {
-            messageBox.innerHTML = `<span class="text-danger">❌ ${data.message}</span>`;
-        }
-    })
-    .catch(() => {
-        messageBox.innerHTML = `<span class="text-danger">Something went wrong.</span>`;
-    });
-});
-</script> --}}
 
-<script>
-document.getElementById('updatePasswordForm').addEventListener('submit', function (e) {
-    e.preventDefault();
 
-    const new_password = document.getElementById('new_password').value;
-    const confirm_password = document.getElementById('confirm_password').value;
-    const messageBox = document.getElementById('passwordUpdateMsg');
+    <script>
+        document.getElementById('updatePasswordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
 
-    messageBox.innerHTML = '⏳ Updating...';
+            const form = e.target;
+            const formData = new FormData(form);
+            const messageBox = document.getElementById('passwordUpdateMsg');
+            messageBox.innerHTML = '⏳ Updating...';
 
-    fetch('{{ route("user.password.update") }}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify({ new_password, confirm_password })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            messageBox.innerHTML = `<span class="text-success">✅ ${data.message}</span>`;
+            fetch('{{ route('user.password.update') }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    },
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        messageBox.innerHTML = `<span class="text-success">✅ ${data.message}</span>`;
+                        if (data.redirect) {
+                            localStorage.setItem('success_flash', data.password_message);
+                            setTimeout(() => {
+                                window.location.href = data.redirect_url;
+                            }, 800);
+                        }
+                    } else {
+                        messageBox.innerHTML = `<span class="text-danger">❌ ${data.message}</span>`;
+                    }
+                })
+                .catch(() => {
+                    messageBox.innerHTML = `<span class="text-danger">Something went wrong.</span>`;
+                });
+        });
+    </script>
 
-            // Store message in localStorage and redirect after 800ms
-            if (data.redirect) {
-                localStorage.setItem('success_flash', data.password_message);
-                setTimeout(() => {
-                    window.location.href = data.redirect_url;
-                }, 800);
-            }
-        } else {
-            messageBox.innerHTML = `<span class="text-danger">❌ ${data.message}</span>`;
-        }
-    })
-    .catch(() => {
-        messageBox.innerHTML = `<span class="text-danger">Something went wrong.</span>`;
-    });
-});
-</script>
 
 
 

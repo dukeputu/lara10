@@ -462,6 +462,7 @@ public function appUsersAdminPanelList()
                 'app_users.upi_id',
                 'app_users.upi_qr_code'
             )
+            ->orderBy('user_balance_request.id', 'desc')
             ->get();
 
 
@@ -477,6 +478,7 @@ public function appUsersAdminPanelList()
                     'app_users.upi_qr_code'
                 )
                 ->get();
+
 
 
 
@@ -521,43 +523,6 @@ public function userAppDashboard()
 
 
 
-/*
-    public function userAddBalance(Request $request)
-    {
-        $request->validate([
-            'add_balance_amount' => 'required|string|max:10',
-            'payment_screenShot' => 'nullable|file|mimes:jpeg,png,jpg|max:20048',
-            'userId'             => 'required',
-            'userName'           => 'required',
-            'userPhone'          => 'required',
-        ]);
-
-        $uploadFile = function ($request, $inputName, $folder) {
-            if ($request->hasFile($inputName)) {
-                $file = $request->file($inputName);
-                $filename = Str::slug($request->userPhone) . '_' . now()->format('YmdHis') .'_' . Str::random(5) . '.'. $file->getClientOriginalExtension();
-                $file->move(public_path("uploads/$folder"), $filename);
-                return "uploads/$folder/" . $filename;
-            }
-            return null;
-        };
-
-        $paymentScreenShot = $uploadFile($request, 'payment_screenShot', 'userPaymentScreenShot');
-
-        DB::table('user_balance_request')->insert([
-            'app_user_id'     => $request->userId,
-            'app_user_name'   => $request->userName,
-            'user_phone'      => $request->userPhone,
-            'req_bal_amount'  => $request->add_balance_amount,
-            'pay_screenshot'  => $paymentScreenShot,
-            'status'          => 2, // Pending or Under Review
-            'created_at'      => now(),
-            'updated_at'      => now(),
-        ]);
-
-        return back()->with('success', 'Rs.' . $request->add_balance_amount . ' Balance request submitted successfully. Balance Add Soon Please Wait for Approval');
-    }
-*/
 
 
 
@@ -622,42 +587,7 @@ public function userAddBalance(Request $request)
 
     /*    return redirect()->route('userLogin.app')->with('success', '<h3 style="color:#fff;"> Registered Successfully.<br> Login User Name = ' . $request->phone_number . '<br>Login Password Is = 000111</h3>'); */
 
-/*
-public function withdrawMoneyUserApp(Request $request)
-    {
-        $request->validate([
-            'withdraw_req' => 'required|string|max:10',
-            'userId'             => 'required',
-            'userName'           => 'required',
-            'userPhone'          => 'required',
-        ]);
 
-        $uploadFile = function ($request, $inputName, $folder) {
-            if ($request->hasFile($inputName)) {
-                $file = $request->file($inputName);
-                $filename = Str::slug($request->userPhone) . '_' . now()->format('YmdHis') .'_' . Str::random(5) . '.'. $file->getClientOriginalExtension();
-                $file->move(public_path("uploads/$folder"), $filename);
-                return "uploads/$folder/" . $filename;
-            }
-            return null;
-        };
-
-        // $paymentScreenShot = $uploadFile($request, 'payment_screenShot', 'userPaymentScreenShot');
-
-        DB::table('user_withdraw_request')->insert([
-            'app_user_id'     => $request->userId,
-            'app_user_name'   => $request->userName,
-            'user_phone'      => $request->userPhone,
-            'req_bal_amount'  => $request->withdraw_req,
-            'pay_screenshot'  => 0,
-            'status'          => 2, // Pending or Under Review
-            'created_at'      => now(),
-            'updated_at'      => now(),
-        ]);
-
-        return back()->with('success', 'Rs.' . $request->withdraw_req . ' Balance Withdraw Request submitted successfully. Balance Add Soon Please Wait for Approval');
-    }
-*/
 
 
 public function withdrawMoneyUserApp(Request $request)
@@ -733,41 +663,7 @@ public function withdrawMoneyUserApp(Request $request)
     }
 }
 
-/*
-public function withdrawalScrenshortUpload(Request $request, $id)
-{
 
-    $request->validate([
-        'payment_screenshot' => 'nullable|file|mimes:jpeg,png,jpg|max:20048',
-    ]);
-
-    $withdrawal = \DB::table('user_withdraw_request')->where('id', $id)->first();
-
-    if (!$withdrawal) {
-        return back()->with('error', 'Withdrawal request not found.');
-    }
-
-    // Default path (existing screenshot or null)
-    $filePath = $withdrawal->pay_screenshot;
-
-    // If file uploaded, save new one
-    if ($request->hasFile('payment_screenshot')) {
-        $file = $request->file('payment_screenshot');
-        $filename = time() . '_' . $file->getClientOriginalName();
-        $file->move(public_path('uploads/withdrawalDone'), $filename);
-        $filePath = 'uploads/withdrawalDone/' . $filename;
-    }
-
-    // Update DB
-    \DB::table('user_withdraw_request')->where('id', $id)->update([
-        'pay_screenshot' => $filePath,
-        'status' => 1,
-        'updated_at' => now()
-    ]);
-
-    return back()->with('success', 'Screenshot uploaded and status updated successfully.');
-}
-*/
 
 public function withdrawalScrenshortUpload(Request $request, $id)
 {
@@ -825,50 +721,9 @@ public function withdrawalScrenshortUpload(Request $request, $id)
 
 
 
-/*
-public function addBalanceTrafer(Request $request, $id)
-{
-    $request->validate([
-        'userBlaAdd' => 'required|numeric',
-    ]);
-
-    $withdrawal = DB::table('user_balance_request')->where('id', $id)->first();
-
-    if (!$withdrawal) {
-        return back()->with('error', 'Withdrawal request not found.');
-    }
-
-    // Update status in user_balance_request
-    DB::table('user_balance_request')->where('id', $id)->update([
-        'status' => 1,
-        'updated_at' => now(),
-    ]);
-
-    // Fetch current wallet balance
-    $user = DB::table('app_users')->where('id', $withdrawal->app_user_id)->first();
-
-    if (!$user) {
-        return back()->with('error', 'User not found.');
-    }
-
-    $currentWallet = is_numeric($user->user_wallet) ? (float)$user->user_wallet : 0;
-    $requestedAmount = (float)$request->userBlaAdd;
-    $newWalletBalance = $currentWallet + $requestedAmount;
-
-    // Update wallet balance
-    DB::table('app_users')->where('id', $withdrawal->app_user_id)->update([
-        'user_wallet' => $newWalletBalance,
-        // 'updated_at' => now(),
-    ]);
-
-      // Update session value
-    // Session::put('app_user_wallet', $newWalletBalance);
-
-    return back()->with('success', 'Balance transferred successfully.');
-}
-*/
 
 
+/* 
 public function addBalanceTrafer(Request $request, $id)
 {
     $request->validate([
@@ -921,56 +776,77 @@ public function addBalanceTrafer(Request $request, $id)
 
     return back()->with('success', 'Balance transferred and transaction recorded successfully.');
 }
+ */
 
 
-
-
-/*
-public function buyPackage(Request $request)
+// ************************************************************
+public function addBalanceTrafer(Request $request, $id)
 {
-    $userId = Session::get('app_user_id');  // Use session-stored user ID
-   
-
-    if (!$userId) {
-        return redirect()->route('userLogin.app')->with('error', 'You must be logged in to buy a package.');
-    }
-
-    $packageId = $request->package_id;
-
-    $user = DB::table('app_users')->where('id', $userId)->first();
-    $package = DB::table('package_master')->where('id', $packageId)->first();
-
-    if (!$user || !$package) {
-        return back()->with('error', 'User or Package not found.');
-    }
-
-    if ((float)$user->user_wallet < (float)$package->package_amount) {
-        return back()->with('error', 'Insufficient wallet balance.');
-    }
-
-    // Deduct wallet balance
-    $newWallet = (float)$user->user_wallet - (float)$package->package_amount;
-
-    DB::table('app_users')->where('id', $userId)->update([
-        'user_wallet' => $newWallet,
-        'updated_at' => now()
+    $request->validate([
+        'userBlaAdd' => 'required|numeric',
     ]);
 
-    // Optional: record package purchase
-    DB::table('user_package_purchases')->insert([
-        'app_user_id'   => $userId,
-        'package_id'    => $packageId,
-        'amount_paid'   => $package->package_amount,
-        'created_at'    => now(),
-        'updated_at'    => now(),
-    ]);
+    // Get withdrawal request
+    $balanceRequest = DB::table('user_balance_request')->where('id', $id)->first();
 
-    // Update session value
-    Session::put('app_user_wallet', $newWallet);
+    if (!$balanceRequest) {
+        return back()->with('error', 'Balance request not found.');
+    }
 
-    return back()->with('success', 'Package purchased successfully!');
+    // Fetch user
+    $user = DB::table('app_users')->where('id', $balanceRequest->app_user_id)->first();
+
+    if (!$user) {
+        return back()->with('error', 'User not found.');
+    }
+
+    $requestedAmount = (float)$request->userBlaAdd;
+    $walletBefore = (float)$user->user_wallet;
+    $walletAfter = $walletBefore + $requestedAmount;
+
+    DB::beginTransaction();
+
+    try {
+        // 1. Update request status to "Done"
+        DB::table('user_balance_request')->where('id', $id)->update([
+            'status' => 1,
+            'updated_at' => now(),
+        ]);
+
+        // 2. Update user's wallet
+        DB::table('app_users')->where('id', $user->id)->update([
+            'user_wallet' => $walletAfter,
+        ]);
+
+        // 3. Update the existing transaction
+        DB::table('user_transactions')
+            ->where('app_user_id', $user->id)
+            ->where('type_id', 1) // Add Balance
+            ->where('status', 'Pending')
+            ->where('amount', $requestedAmount)
+            ->orderBy('created_at', 'desc')
+            ->limit(1)
+            ->update([
+                'wallet_after' => $walletAfter,
+                'status'       => 'Done',
+                'done_at'      => now(),
+                'updated_at'   => now(),
+            ]);
+
+        DB::commit();
+
+        return back()->with('success', 'Balance transferred and transaction updated successfully.');
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return back()->with('error', 'An error occurred while updating balance.');
+    }
 }
-*/
+// *************************************************************
+
+
+
+
 
 public function buyPackage(Request $request)
 {
@@ -1072,100 +948,9 @@ public function showPackageBuyingRequests()
     return view('admin.logicApp.packageBuyingRequest', compact('requests'));
 }
 
-/*
-public function userAppDashboardUpdate()
-{
-    $userId = session('app_user_id');
-
-    // Get uncredited packages for this user
-    $purchases = DB::table('user_package_purchases')
-        ->join('package_master', 'user_package_purchases.package_id', '=', 'package_master.id')
-        ->where('user_package_purchases.app_user_id', $userId)
-        ->where('user_package_purchases.is_credited', 0)
-        ->select(
-            'user_package_purchases.id as purchase_id',
-            'user_package_purchases.created_at',
-            'package_master.package_total_amount',
-            'package_master.package_time_duration'
-        )
-        ->get();
-
-    foreach ($purchases as $purchase) {
-        $matureTime = \Carbon\Carbon::parse($purchase->created_at)->addMinutes($purchase->package_time_duration);
-        if (now()->greaterThanOrEqualTo($matureTime)) {
-            // Credit wallet
-            DB::table('app_users')
-                ->where('id', $userId)
-                ->update([
-                    'user_wallet' => DB::raw('user_wallet + ' . $purchase->package_total_amount)
-                ]);
-
-            // Mark as credited
-            DB::table('user_package_purchases')
-                ->where('id', $purchase->purchase_id)
-                ->update([
-                    'is_credited' => 1,
-                    'updated_at' => now()
-                ]);
-        }
-    }
-
-    // Continue with dashboard logic
-    $userWallet = DB::table('app_users')->where('id', $userId)->value('user_wallet');
-    Session::put('app_user_wallet', $userWallet);
-
-    return view('userApp.userAppView.dashboard', compact('userWallet'));
-}
-*/
-/*
-public function userAppDashboardUpdate()
-{   
-      $appPackages = \DB::table('package_master')->get();
-    $userId = session('app_user_id');
-
-    // Get uncredited matured packages
-    $purchases = DB::table('user_package_purchases')
-        ->join('package_master', 'user_package_purchases.package_id', '=', 'package_master.id')
-        ->where('user_package_purchases.app_user_id', $userId)
-        ->where('user_package_purchases.is_credited', 0)
-        ->select(
-            'user_package_purchases.id as purchase_id',
-            'user_package_purchases.created_at',
-            'package_master.package_total_amount',
-            'package_master.package_time_duration'
-        )
-        ->get();
-
-    foreach ($purchases as $purchase) {
-        $matureTime = \Carbon\Carbon::parse($purchase->created_at)
-            ->addMinutes(intval($purchase->package_time_duration));
-
-        if (now()->greaterThanOrEqualTo($matureTime)) {
-            $currentWallet = DB::table('app_users')->where('id', $userId)->value('user_wallet');
-            $newWallet = floatval($currentWallet) + floatval($purchase->package_total_amount);
-
-            DB::table('app_users')
-                ->where('id', $userId)
-                ->update(['user_wallet' => $newWallet]);
-
-            DB::table('user_package_purchases')
-                ->where('id', $purchase->purchase_id)
-                ->update([
-                    'is_credited' => 1,
-                    'updated_at' => now()
-                ]);
-        }
-    }
-
-    // Update session and return view
-    $userWallet = DB::table('app_users')->where('id', $userId)->value('user_wallet');
-    Session::put('app_user_wallet', $userWallet);
-
-    return view('userApp.userAppView.dashboard', compact('userWallet','appPackages'));
-}
-*/
 
 
+// ******************************************************
 public function userAppDashboardUpdate()
 {
     $appPackages = DB::table('package_master')->get();
@@ -1244,22 +1029,9 @@ public function userAppDashboardUpdate()
 
     return view('userApp.userAppView.dashboard', compact('userWallet', 'appPackages','hasBoughtPackage1'));
 }
+// ************************************************************
 
 
-
-/* 
-public function allTransactionsUserApp()
-{
-    $userId = session('app_user_id');
-
-    $transactions = DB::table('user_transactions')
-        ->where('app_user_id', $userId)
-        ->orderByDesc('requested_at')
-        ->get();
-
-    return view('userApp.userAppView.allTransactions', compact('transactions'));
-}
- */
 
 public function allTransactionsUserApp(Request $request)
 {
@@ -1279,169 +1051,10 @@ public function allTransactionsUserApp(Request $request)
     return view('userApp.userAppView.allTransactions', compact('transactions'));
 }
 
-/*
-public function myPackagesList()
-{
-    $userId = session('app_user_id');
 
-    $appPackages = DB::table('user_package_purchases')
-        ->join('package_master', 'user_package_purchases.package_id', '=', 'package_master.id')
-        ->where('user_package_purchases.app_user_id', $userId)
-        ->select(
-            'user_package_purchases.id as purchase_id',
-            'user_package_purchases.created_at',
-            'package_master.package_total_amount',
-            'package_master.package_time_duration',
-            'package_master.package_name',
-            'package_master.package_amount',
-            'package_master.package_payout_per'
-        )
-        ->get()
-        ->map(function ($package) {
-            $start = \Carbon\Carbon::parse($package->created_at);
-            $expiry = $start->copy()->addMinutes($package->package_time_duration);
-            $package->status = now()->lt($expiry) ? 'Active' : 'Expired';
-            $package->expiry_at = $expiry;
-            return $package;
-        })
-        ->sortByDesc(fn($pkg) => $pkg->status === 'Active'); // Active on top
 
-    return view('userApp.userAppView.myPackagesList', compact('appPackages'));
-}
-*/
 
-/*
-public function myPackagesList()
-{
-    $userId = session('app_user_id');
 
-    // Step 1: Get all package-related transactions (Buy = 2, Maturity = 3)
-    $transactions = DB::table('user_transactions')
-        ->where('app_user_id', $userId)
-        ->whereIn('type_id', [2, 3])
-        ->orderByDesc('id')
-        ->get();
-
-    // Step 2: Map matching package data
-    $packageData = DB::table('user_package_purchases as upp')
-        ->join('package_master as pm', 'upp.package_id', '=', 'pm.id')
-        ->where('upp.app_user_id', $userId)
-        ->select(
-            'upp.id as purchase_id',
-            'upp.amount_paid',
-            'upp.created_at as purchase_created_at',
-            'upp.is_credited',
-            'pm.package_name',
-            'pm.package_amount',
-            'pm.package_total_amount',
-            'pm.package_time_duration',
-            'pm.package_payout_per'
-        )
-        ->get();
-
-    // Step 3: Combine matching transactions with package details
-    $combined = $transactions->map(function ($txn) use ($packageData) {
-        $match = $packageData->first(function ($pkg) use ($txn) {
-            return (float)$pkg->amount_paid === (float)$txn->amount &&
-                   \Carbon\Carbon::parse($pkg->purchase_created_at)->format('Y-m-d H:i') === \Carbon\Carbon::parse($txn->requested_at)->format('Y-m-d H:i');
-        });
-
-        return (object)[
-            'type_id'           => $txn->type_id,
-            'type_name'         => $txn->type_id == 2 ? 'Package Buy' : 'Maturity',
-            'status'            => $txn->status,
-            'amount'            => $txn->amount,
-            'wallet_before'     => $txn->wallet_before,
-            'wallet_after'      => $txn->wallet_after,
-            'requested_at'      => $txn->requested_at,
-            'done_at'           => $txn->done_at,
-            'package_name'      => $match->package_name ?? 'N/A',
-            'package_amount'    => $match->package_amount ?? null,
-            'package_total_amount' => $match->package_total_amount ?? null,
-            'package_time_duration' => $match->package_time_duration ?? null,
-            'package_payout_per' => $match->package_payout_per ?? null,
-            'is_credited'       => $match->is_credited ?? null,
-        ];
-    });
-
-    return view('userApp.userAppView.myPackagesList', [
-        'appPackages' => $combined
-    ]);
-}
-*/
-/*
-public function myPackagesList()
-{
-    $userId = session('app_user_id');
-
-    // Step 1: Get package Buy (2) and Maturity (3) transactions
-    $transactions = DB::table('user_transactions')
-        ->where('app_user_id', $userId)
-        ->whereIn('type_id', [2, 3])
-        ->orderByDesc('id')
-        ->get();
-
-    // Step 2: Get package info
-    $packageData = DB::table('user_package_purchases as upp')
-        ->join('package_master as pm', 'upp.package_id', '=', 'pm.id')
-        ->where('upp.app_user_id', $userId)
-        ->select(
-            'upp.id as purchase_id',
-            'upp.amount_paid',
-            'upp.created_at as purchase_created_at',
-            'upp.is_credited',
-            'pm.package_name',
-            'pm.package_amount',
-            'pm.package_total_amount',
-            'pm.package_time_duration',
-            'pm.package_payout_per'
-        )
-        ->get();
-
-    // Step 3: Map transactions with packages
-    $combined = $transactions->map(function ($txn) use ($packageData) {
-        $match = null;
-
-        // Match BUY by exact amount and created_at timestamp
-        if ($txn->type_id == 2) {
-            $match = $packageData->first(function ($pkg) use ($txn) {
-                return (float)$pkg->amount_paid === (float)$txn->amount &&
-                    \Carbon\Carbon::parse($pkg->purchase_created_at)->format('Y-m-d H:i') ===
-                    \Carbon\Carbon::parse($txn->requested_at)->format('Y-m-d H:i');
-            });
-        }
-
-        // Match MATURITY by credited = 1 and matching maturity amount
-        if ($txn->type_id == 3) {
-            $match = $packageData->first(function ($pkg) use ($txn) {
-                return $pkg->is_credited == 1 &&
-                    (float)$pkg->package_total_amount === (float)$txn->amount;
-            });
-        }
-
-        return (object)[
-            'type_id'           => $txn->type_id,
-            'type_name'         => $txn->type_id == 2 ? 'Package Buy' : 'Maturity',
-            'status'            => $txn->status,
-            'amount'            => $txn->amount,
-            'wallet_before'     => $txn->wallet_before,
-            'wallet_after'      => $txn->wallet_after,
-            'requested_at'      => $txn->requested_at,
-            'done_at'           => $txn->done_at,
-            'package_name'      => $match->package_name ?? 'N/A',
-            'package_amount'    => $match->package_amount ?? null,
-            'package_total_amount' => $match->package_total_amount ?? null,
-            'package_time_duration' => $match->package_time_duration ?? null,
-            'package_payout_per' => $match->package_payout_per ?? null,
-            'is_credited'       => $match->is_credited ?? null,
-        ];
-    });
-
-    return view('userApp.userAppView.myPackagesList', [
-        'appPackages' => $combined
-    ]);
-}
-*/
 
 public function myPackagesList()
 {
@@ -1543,74 +1156,9 @@ public function downlinesTree()
 
 
 
-/* 
-private function buildTreeHtml($members, $parentId = null)
-{
-    $html = '';
-    $children = $members->where('introducer_id', $parentId);
-
-    if ($children->count()) {
-        $html .= '<ul class="children">';
-        foreach ($children as $member) {
-            $hasChild = $members->where('introducer_id', $member->id)->count() > 0;
-
-            $html .= '<li>';
-            $html .= '<div  class="node toggle ' . ($hasChild ? 'open' : '') . '" style="border: 1px solid #ccc;">' .
-                     ($hasChild ? '➖' : '👤') . ' ' .
-                     $member->app_u_name . ' <span data-bs-toggle="modal" data-bs-target="#ModalBasic">[' . $member->phone_number . ']</span></div>';
-            $html .= $this->buildTreeHtml($members, $member->id);
-            $html .= '</li>';
-        }
-        $html .= '</ul>';
-    }
-
-    return $html;
-}
-
- */
 
 
-/* 
-private function buildTreeHtml($members, $parentId = null)
-{
-    $html = '';
-    $children = $members->where('introducer_id', $parentId);
 
-    if ($children->count()) {
-        $html .= '<ul class="children">';
-        foreach ($children as $member) {
-            $hasChild = $members->where('introducer_id', $member->id)->count() > 0;
-
-            $html .= '<li>';
-            $html .= '<div class="node toggle ' . ($hasChild ? 'open' : '') . '" style="border: 1px solid #ccc; padding: 4px; margin: 2px 0;">';
-
-            $html .= ($hasChild ? '➖' : '👤') . ' ';
-            $html .= $member->app_u_name;
-
-            // 👇 Modal Trigger Span
-            $html .= ' <span 
-                            class="openIncomeModal" 
-                            data-user-name="' . $member->app_u_name . '" 
-                            data-user-phone="' . $member->phone_number . '" 
-                            data-user-id="' . $member->id . '" 
-                            style="cursor:pointer; color:blue;" 
-                            data-bs-toggle="modal" 
-                            data-bs-target="#ModalBasic"
-                        >[' . $member->phone_number . ']</span>';
-
-            $html .= '</div>';
-
-            // Recursive call for children
-            $html .= $this->buildTreeHtml($members, $member->id);
-
-            $html .= '</li>';
-        }
-        $html .= '</ul>';
-    }
-
-    return $html;
-}
- */
 
 private function buildTreeHtml($members, $parentId = null)
 {
@@ -1656,30 +1204,7 @@ private function buildTreeHtml($members, $parentId = null)
 
 
 
-/* public function getDownlineIncome($userId)
-{
-    // Get clicked user's phone
-    $user = DB::table('app_users')->where('id', $userId)->first();
 
-    if (!$user) {
-        return response()->json(['downlines' => []]);
-    }
-
-    $downlines = DB::table('app_users as u')
-        ->leftJoin('user_package_purchases as upp', 'upp.app_user_id', '=', 'u.id')
-        ->select(
-            'u.app_u_name as name',
-            'u.phone_number as phone',
-            DB::raw('COALESCE(upp.amount_paid, 0) as amount')
-        )
-        ->where('u.introducer_phone', $user->phone_number)
-        ->get();
-
-    return response()->json([
-        'downlines' => $downlines
-    ]);
-}
- */
 
 
 public function getDownlineIncome($id)
@@ -1710,8 +1235,14 @@ private function getAllDownlineUserIds($parentId)
     return $ids;
 }
 
-/* 
-public function updatePassword(Request $request)
+
+
+
+
+
+
+
+    public function updatePassword(Request $request)
 {
     $userId = session('app_user_id');
 
@@ -1719,41 +1250,51 @@ public function updatePassword(Request $request)
         return response()->json(['success' => false, 'message' => 'User not authenticated.']);
     }
 
+    // Validate file types
+    $request->validate([
+        'upi_qr_code' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
+        'user_pic_img' => 'nullable|file|mimes:jpeg,png,jpg|max:2048',
+    ]);
+
+    // Check password match
     if ($request->new_password !== $request->confirm_password) {
         return response()->json(['success' => false, 'message' => 'Passwords do not match.']);
     }
 
-    DB::table('app_users')->where('id', $userId)->update([
+    // Upload helper
+    $uploadFile = function ($field, $folder, $prefix = '') use ($request) {
+        if ($request->hasFile($field)) {
+            $file = $request->file($field);
+            $filename = 'USER_' . $prefix . '_' . time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path("uploads/$folder"), $filename);
+            return "uploads/$folder/" . $filename;
+        }
+        return null;
+    };
+
+    // Upload files if present
+    $qrPath = $uploadFile('upi_qr_code', 'qr_user', 'qr');
+    $picPath = $uploadFile('user_pic_img', 'user_pics', 'pic');
+
+    // Prepare update data
+    $updateData = [
         'password' => Hash::make($request->new_password),
+        'bank_name' => $request->bank_name,
+        'ifsc_code' => $request->ifsc_code,
+        'bank_account_no' => $request->bank_account_no,
+        'upi_id' => $request->upi_id,
         'updated_at' => now(),
-    ]);
+    ];
 
-    return response()->json(['success' => true, 'message' => 'Password updated successfully.']);
-}
- */
+    if ($qrPath) $updateData['upi_qr_code'] = $qrPath;
+    if ($picPath) $updateData['user_pic_img'] = $picPath;
 
+    // Update user
+    DB::table('app_users')->where('id', $userId)->update($updateData);
 
-public function updatePassword(Request $request)
-{
-    $userId = session('app_user_id');
-
-    if (!$userId) {
-        return response()->json(['success' => false, 'message' => 'User not authenticated.']);
-    }
-
-    if ($request->new_password !== $request->confirm_password) {
-        return response()->json(['success' => false, 'message' => 'Passwords do not match.']);
-    }
-
-    DB::table('app_users')->where('id', $userId)->update([
-        'password' => Hash::make($request->new_password),
-        'updated_at' => now(),
-    ]);
-
-    // Send redirect flag and password message for login page
     return response()->json([
         'success' => true,
-        'message' => 'Password updated successfully.',
+        'message' => 'Password & bank details updated successfully.',
         'redirect' => true,
         'redirect_url' => route('userLogin.app'),
         'password_message' => '<h3 style="color:#fff;">Your new password is: <strong>' . $request->new_password . '</strong><br>Save it carefully.</h3>'
